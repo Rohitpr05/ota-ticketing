@@ -6,13 +6,4 @@ coverage/
 
 # Prisma generated client
 api/src/generated/
-
-# Expo
-app/.expo/
-app/dist/
-app/web-build/
-app/ios/
-app/android/
-app/expo-env.d.ts
-*.tsbuildinfo
 .DS_Store
