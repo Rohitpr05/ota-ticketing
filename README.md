@@ -95,9 +95,9 @@ done; wait
 
 ## How overselling is prevented
 
-Booking runs in one transaction that starts with a single conditional update:
-`UPDATE Event SET ticketsLeft = ticketsLeft - n WHERE id = ? AND ticketsLeft >= n AND startsAt >= now`.
-MySQL locks the event row for that update, so concurrent bookings queue up, and each one re-checks `ticketsLeft >= n` against the latest value. If no row was updated, the booking is rejected (404 / 409). Otherwise the tickets are inserted in the same transaction, so the stock change and the tickets are saved together or not at all. See [`api/src/services/booking.ts`](api/src/services/booking.ts).
+Each booking does one conditional update, `UPDATE Event SET ticketsLeft = ticketsLeft - n WHERE id = ? AND ticketsLeft >= n`, instead of reading the stock first and then writing it.
+MySQL locks the event row during that update, so simultaneous bookings take turns and each one re-checks the stock. If no row changes, the request gets a 409.
+The tickets are created in the same transaction, so they are saved together with the stock change or not at all ([`booking.ts`](api/src/services/booking.ts)).
 
 ## How double check-in is prevented
 
