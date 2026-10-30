@@ -1,0 +1,44 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  // CommonJS keeps Jest (ts-jest) simple; the API itself is CommonJS too.
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  name    String
+  tickets Ticket[]
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String
+  venue       String
+  startsAt    DateTime
+  // Smallest currency unit (yen has no minor unit), never a float.
+  price       Int
+  currency    String   @default("JPY") @db.Char(3)
+  capacity    Int
+  ticketsLeft Int
+  tickets     Ticket[]
+
+  @@index([startsAt])
+}
+
+model Ticket {
+  id          String    @id @default(cuid())
+  code        String    @unique @db.VarChar(16)
+  userId      Int
+  eventId     Int
+  createdAt   DateTime  @default(now())
+  checkedInAt DateTime?
+  user        User      @relation(fields: [userId], references: [id])
+  event       Event     @relation(fields: [eventId], references: [id])
+
+  @@index([userId])
+}
