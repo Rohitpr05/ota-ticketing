@@ -1,5 +1,3 @@
-// Visual language borrowed from the Ota Life app: airy light background, white rounded cards,
-// sky-blue accent and blue→purple gradients.
 export const colors = {
   primary: "#0EA5E9",
   primarySoft: "#E0F2FE",

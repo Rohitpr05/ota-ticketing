@@ -7,7 +7,6 @@ const HEIGHT = 40;
 // Leaves room above the letters for the macron on "Ō".
 const BASELINE = 32;
 
-// The brand wordmark as text filled with the sky-blue → purple gradient.
 export function Wordmark() {
   return (
     <Svg width={WIDTH} height={HEIGHT} accessibilityLabel={BRAND_NAME}>

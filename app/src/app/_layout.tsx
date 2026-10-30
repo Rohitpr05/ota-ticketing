@@ -29,7 +29,6 @@ export default function RootLayout() {
           sceneStyle: { backgroundColor: colors.background },
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.textMuted,
-          // Light-blue rounded background behind the active tab, like the Feed tab in the Ota Life app.
           tabBarActiveBackgroundColor: colors.primarySoft,
           tabBarItemStyle: { borderRadius: radius.md, marginHorizontal: spacing.sm, marginTop: spacing.xs },
           tabBarLabelStyle: { fontSize: fontSize.xs, fontWeight: "600" },
@@ -49,7 +48,6 @@ export default function RootLayout() {
           options={{
             title: t("tabs.scan"),
             tabBarIcon: tabIcon("scan-outline"),
-            // The scanner is full-screen: no header and no tab bar.
             headerShown: false,
             tabBarStyle: { display: "none" },
           }}

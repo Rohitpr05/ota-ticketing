@@ -1,8 +1,7 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 
-// Loads data whenever the screen comes into focus (or `load` changes, e.g. after switching user),
-// so lists are fresh after booking on another tab.
+// Reloads on every focus (and when `load` changes, e.g. after switching user) so lists stay fresh across tabs.
 export function useRequest<T>(load: () => Promise<T>) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<unknown>(null);

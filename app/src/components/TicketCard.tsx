@@ -28,7 +28,6 @@ export function TicketCard({ ticket }: { ticket: Ticket }) {
 
       <View style={styles.divider} />
 
-      {/* A used ticket's QR is dimmed so it reads as spent at a glance. */}
       <View style={[styles.qr, checkedIn && styles.usedQr]}>
         <QRCode value={ticket.code} size={QR_SIZE} />
         <Text style={styles.code}>{ticket.code}</Text>

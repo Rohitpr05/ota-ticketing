@@ -1,6 +1,5 @@
 import { prisma } from "../db";
 
-// The public shape of an event, reused wherever an event is returned.
 export const eventSelect = {
   id: true,
   name: true,

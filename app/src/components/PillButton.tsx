@@ -8,7 +8,6 @@ type PillButtonProps = {
   loading?: boolean;
 };
 
-// The filled sky-blue pill used for primary actions; greys out like the app's inactive pills when disabled.
 export function PillButton({ label, onPress, disabled = false, loading = false }: PillButtonProps) {
   const inactive = disabled || loading;
   return (

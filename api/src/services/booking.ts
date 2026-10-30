@@ -6,9 +6,8 @@ export async function bookTickets(userId: number, eventId: number, quantity: num
   const now = new Date();
 
   return prisma.$transaction(async (tx) => {
-    // Why this can't oversell: the conditional UPDATE row-locks the event in MySQL, so concurrent bookings
-    // for the same event wait their turn, and each one re-checks `ticketsLeft >= quantity` against the
-    // latest committed value before decrementing. A read-then-write would let two requests see the same stock.
+    // One conditional UPDATE, not read-then-write: MySQL locks the event row, so concurrent bookings
+    // queue up and each re-checks ticketsLeft against the latest value.
     const { count } = await tx.event.updateMany({
       where: { id: eventId, ticketsLeft: { gte: quantity }, startsAt: { gte: now } },
       data: { ticketsLeft: { decrement: quantity } },
@@ -26,7 +25,7 @@ export async function bookTickets(userId: number, eventId: number, quantity: num
       throw new HttpError(409, "SOLD_OUT", message, { ticketsLeft: event.ticketsLeft });
     }
 
-    // Same transaction: if creating tickets fails, the decrement above is rolled back too.
+    // Same transaction, so a failed insert also rolls back the decrement.
     const codes = Array.from({ length: quantity }, generateTicketCode);
     await tx.ticket.createMany({ data: codes.map((code) => ({ code, userId, eventId })) });
 

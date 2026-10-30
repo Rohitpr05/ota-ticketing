@@ -20,7 +20,6 @@ function Avatar({ name }: { name: string }) {
   );
 }
 
-// Tapping the avatar opens a picker of the seeded users, so the demo can act as different people.
 export function UserSwitcher() {
   const { t } = useTranslation();
   const { userId, setUserId } = useCurrentUser();

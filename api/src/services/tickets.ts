@@ -14,7 +14,7 @@ export const ticketSelect = {
   event: { select: eventSelect },
 } as const;
 
-// 32^10 ≈ 10^15 possible codes from a CSPRNG, so codes can't be guessed; the unique index rejects the rare clash.
+// crypto.randomInt makes codes unguessable; the unique index rejects the rare clash.
 export function generateTicketCode(): string {
   let code = "";
   for (let i = 0; i < CODE_LENGTH; i++) {

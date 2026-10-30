@@ -31,19 +31,21 @@ async function checkInCode(userId: number, code: string): Promise<ScanResult> {
   }
 }
 
-function CircleButton(props: {
+type CircleButtonProps = {
   icon: ComponentProps<typeof Ionicons>["name"];
   label: string;
   onPress: () => void;
-}) {
+};
+
+function CircleButton({ icon, label, onPress }: CircleButtonProps) {
   return (
     <Pressable
-      onPress={props.onPress}
+      onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={props.label}
+      accessibilityLabel={label}
       style={styles.circleButton}
     >
-      <Ionicons name={props.icon} size={24} color={colors.white} />
+      <Ionicons name={icon} size={24} color={colors.white} />
     </Pressable>
   );
 }
@@ -57,8 +59,7 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [torchOn, setTorchOn] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
-  // The camera reports the same QR code many times per second, faster than state updates re-render;
-  // a ref blocks the repeats immediately so one code only sends one request.
+  // The camera reports a code many times per second; a ref (unlike state) blocks repeats immediately.
   const scanLocked = useRef(false);
 
   useEffect(() => {
