@@ -45,8 +45,16 @@ Scan the QR code in the terminal with the iPhone Camera, or from inside Expo Go 
 
 1. **Events:** "Ōta TOKYO Idol Live" has 2 tickets left. Book 2 and it shows _Sold out_.
 2. **My Tickets:** each ticket is a QR code.
-3. **Scan:** open a ticket's QR on another screen (for example, screenshot it and open it on your computer), then scan it. The first scan checks it in. A second scan shows _Already checked in_ with the original time.
-4. Tap the avatar to switch between the 3 seeded users, and **EN / 日本語** to switch language.
+3. **Scan:** after booking, print a QR for each of user 1's tickets, plus an invalid one, in your terminal:
+
+   ```bash
+   for c in $(curl -s localhost:3000/me/tickets -H "X-User-Id: 1" | grep -o '"code":"[^"]*"' | cut -d'"' -f4) FAKE123456; do echo "$c"; npx qrcode "$c"; done
+   ```
+
+   The first run may ask `Ok to proceed? (y)` while npx downloads `qrcode`; answer `y`.
+   Scan them with the app's **Scan** tab. A real ticket checks in on the first scan and shows _Already checked in_ (with the original time) on the second. `FAKE123456` shows _Ticket not found_. Change `X-User-Id` to see another user's tickets.
+
+4. **Users:** tap the avatar to switch between Aiko (1), Kenji (2) and Rohit (3). Each user sees only their own tickets, but stock is shared. If Aiko books both Idol Live tickets, it shows _Sold out_ for Kenji and Rohit too. Booking one as Aiko and one as Kenji sells it out as well, with each seeing their own ticket. Tap **EN / 日本語** to switch language.
 
 **Start over:** `cd api && npm run db:seed`, then pull down to refresh in the app.
 
