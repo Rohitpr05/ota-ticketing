@@ -1,154 +1,96 @@
 # Ota Ticketing
 
-A small event-ticketing system: users browse upcoming events, book 1–4 tickets, get a QR code per ticket, and staff scan the QR code to check the ticket in.
-It has an Express + Prisma API on MySQL and an Expo (React Native) app styled after the Ota Life app.
+Browse upcoming Ōta TOKYO events, book 1–4 tickets, and show each ticket as a QR code.
+Staff scan the QR code at the gate to check the ticket in, once.
 
-**Stack:** Node.js 22, Express 5, TypeScript (strict), Prisma 7 (MariaDB driver adapter), MySQL 8, zod, Jest + supertest · Expo SDK 58, Expo Router, expo-camera, react-native-qrcode-svg, i18next.
+**Stack:** Express · Prisma 7 · MySQL 8 · TypeScript · Expo SDK 58 (React Native)
 
-## Prerequisites
+## Requirements
 
-- Node.js 22 LTS (`node -v`)
-- Docker with Docker Compose
-- An iPhone with **Expo Go for SDK 58** (from the App Store), on the same Wi-Fi as your computer
+- Node.js 22, Docker
+- Expo Go (SDK 58) on an iPhone or Android phone, on the same Wi-Fi as your computer
 
-## Setup
+## Run it
 
 ```bash
-# 1. Database (MySQL 8 on port 3306; also creates the `ota_test` database for tests)
+git clone https://github.com/Rohitpr05/ota-ticketing.git
+cd ota-ticketing
 docker compose up -d
+```
 
-# 2. API
+**Terminal 1: API**
+
+```bash
 cd api
 cp .env.example .env
-npm install            # also runs `prisma generate`
-npm run db:migrate     # applies the committed migrations
-npm run db:seed        # clears and reseeds; safe to run again
-npm run dev            # http://localhost:3000
-
-# 3. App (in a second terminal)
-cd app
-cp .env.example .env
-hostname -I            # take the first address, e.g. 192.168.1.23
-# edit .env:  EXPO_PUBLIC_API_URL=http://192.168.1.23:3000
 npm install
+npm run setup      # creates the tables and seed data
+npm run dev        # http://localhost:3000
+```
+
+**Terminal 2: app**
+
+```bash
+cd app
+npm install
+# point the app at your computer's local IP (phone and computer must be on the same Wi-Fi)
+echo "EXPO_PUBLIC_API_URL=http://$(hostname -I | awk '{print $1}'):3000" > .env   # Linux
+# echo "EXPO_PUBLIC_API_URL=http://$(ipconfig getifaddr en0):3000" > .env        # macOS
 npx expo start
 ```
 
-Scan the QR code shown in the terminal with the iPhone camera. It opens in Expo Go. When iOS asks, allow **Local Network** access for Expo Go, or the app can't reach the API.
+Scan the QR code in the terminal with the iPhone Camera, or from inside Expo Go on Android. On iOS, allow **Local Network** access when asked.
 
-## Seed data
+## Try it
 
-| User id | Name  |
-| ------- | ----- |
-| 1       | Aiko  |
-| 2       | Kenji |
-| 3       | Rohit |
+1. **Events:** "Ōta TOKYO Idol Live" has 2 tickets left. Book 2 and it shows _Sold out_.
+2. **My Tickets:** each ticket is a QR code.
+3. **Scan:** open a ticket's QR on another screen (for example, screenshot it and open it on your computer), then scan it. The first scan checks it in. A second scan shows _Already checked in_ with the original time.
+4. Tap the avatar to switch between the 3 seeded users, and **EN / 日本語** to switch language.
 
-Four upcoming events are created with dates relative to now. **Event 3, "Ōta TOKYO Idol Live", has exactly 2 tickets left.** Prices are in yen.
-
-In the app, tap the avatar (top right) to switch between users.
+**Start over:** `cd api && npm run db:seed`, then pull down to refresh in the app.
 
 ## API
 
-Every endpoint except `GET /health` needs an `X-User-Id` header with a seeded user id.
-
-| Endpoint                | Body                | Success                                       |
-| ----------------------- | ------------------- | --------------------------------------------- |
-| `GET /events`           |                     | 200, upcoming events sorted by date           |
-| `POST /events/:id/book` | `{ "quantity": 1 }` | 201, the created tickets (1–4)                |
-| `GET /me/tickets`       |                     | 200, the user's tickets with event, newest first |
-| `POST /checkins`        | `{ "code": "..." }` | 200, the checked-in ticket with its event     |
-
-Errors always look like `{ "error": { "code": "SOLD_OUT", "message": "...", ...extra } }`:
-400 validation or malformed JSON, 401 missing/unknown user, 404 event/ticket/route not found,
-409 `SOLD_OUT` (with `ticketsLeft`), `EVENT_STARTED`, or `ALREADY_CHECKED_IN` (with the original `checkedInAt`), 500 anything else.
+All requests need an `X-User-Id` header (seeded users: 1, 2, 3).
 
 ```bash
-# List events
-curl -s localhost:3000/events -H "X-User-Id: 1"
-
-# Book 2 tickets for event 3 (the one with 2 left)
-curl -s -X POST localhost:3000/events/3/book -H "X-User-Id: 1" -H "Content-Type: application/json" -d '{"quantity": 2}'
-
-# Book again: 409 SOLD_OUT
-curl -s -X POST localhost:3000/events/3/book -H "X-User-Id: 2" -H "Content-Type: application/json" -d '{"quantity": 1}'
-# {"error":{"code":"SOLD_OUT","message":"Sold out","ticketsLeft":0}}
-
-# My tickets
-curl -s localhost:3000/me/tickets -H "X-User-Id: 1"
-
-# Check in a ticket (use a code from the response above), then again: 409 ALREADY_CHECKED_IN
-curl -s -X POST localhost:3000/checkins -H "X-User-Id: 2" -H "Content-Type: application/json" -d '{"code": "ABCDE12345"}'
-curl -s -X POST localhost:3000/checkins -H "X-User-Id: 2" -H "Content-Type: application/json" -d '{"code": "ABCDE12345"}'
-# {"error":{"code":"ALREADY_CHECKED_IN","message":"...","checkedInAt":"2026-10-30T05:51:28.715Z"}}
+curl localhost:3000/events -H "X-User-Id: 1"
+curl -X POST localhost:3000/events/3/book -H "X-User-Id: 1" -H "Content-Type: application/json" -d '{"quantity": 2}'
+curl localhost:3000/me/tickets -H "X-User-Id: 1"
+curl -X POST localhost:3000/checkins -H "X-User-Id: 1" -H "Content-Type: application/json" -d '{"code": "<code from /me/tickets>"}'
 ```
 
-Quick manual race test (reseed first): three bookings at once for the last 2 tickets. Exactly two get `201`.
+Race for the last 2 tickets of event 3 (run from `api/`). Exactly two requests print `201`, the third `409`:
 
 ```bash
-npm run db:seed --prefix api
+npm run db:seed
 for user in 1 2 3; do
   curl -s -o /dev/null -w "%{http_code}\n" -X POST localhost:3000/events/3/book \
     -H "X-User-Id: $user" -H "Content-Type: application/json" -d '{"quantity": 1}' &
 done; wait
 ```
 
+Errors look like `{ "error": { "code": "SOLD_OUT", "message": "..." } }`: 400 invalid input, 401 missing or unknown user, 404 not found, 409 sold out or already checked in.
+
 ## How overselling is prevented
 
-Each booking does one conditional update, `UPDATE Event SET ticketsLeft = ticketsLeft - n WHERE id = ? AND ticketsLeft >= n`, instead of reading the stock first and then writing it.
-MySQL locks the event row during that update, so simultaneous bookings take turns and each one re-checks the stock. If no row changes, the request gets a 409.
-The tickets are created in the same transaction, so they are saved together with the stock change or not at all ([`booking.ts`](api/src/services/booking.ts)).
+Booking runs one conditional `UPDATE Event SET ticketsLeft = ticketsLeft - n WHERE id = ? AND ticketsLeft >= n` inside a transaction with the ticket inserts.
+MySQL locks the row, so concurrent bookings queue up and re-check the stock. If 0 rows are updated, the request gets a 409 ([`booking.ts`](api/src/services/booking.ts)).
 
-## How double check-in is prevented
+Double check-in is prevented the same way: `UPDATE ... WHERE code = ? AND checkedInAt IS NULL`. Any later scan gets a 409 with the first check-in time.
 
-Check-in is one conditional update: `UPDATE Ticket SET checkedInAt = now WHERE code = ? AND checkedInAt IS NULL`. Only one scan can match an unused ticket. Any later scan updates nothing and gets a 409 with the original `checkedInAt`.
-
-## Running tests
+## Tests
 
 ```bash
-docker compose up -d
 cd api && npm test
 ```
 
-Tests use a separate database, `ota_test`, in the same MySQL container (configured in [`api/.env.test`](api/.env.test)). Jest applies the migrations to it before running, and each test reseeds it. They cover:
+The tests use a separate `ota_test` database in the same container. They cover 10 concurrent bookings for 2 tickets (exactly 2 succeed), double check-in and input validation.
 
-- 10 concurrent single-ticket bookings for the event with 2 left: exactly 2 × 201 and 8 × 409, `ticketsLeft` ends at 0, 2 tickets in the DB
-- check-in once (200), then again (409 with the same `checkedInAt`), plus unknown code (404)
-- validation: quantity 0, 5 or 1.5, unknown event, missing or unknown `X-User-Id`
+## Notes
 
-## Project structure
-
-```
-ota-ticketing/
-├── docker-compose.yml        MySQL 8 + named volume + healthcheck
-├── api/
-│   ├── prisma/               schema, migrations, idempotent seed
-│   ├── prisma7.config.ts     Prisma 7 config (datasource URL, seed command)
-│   ├── src/
-│   │   ├── app.ts            Express app (exported for tests)
-│   │   ├── server.ts         listen()
-│   │   ├── db.ts             PrismaClient with the MariaDB adapter
-│   │   ├── errors.ts         HttpError + JSON error handler
-│   │   ├── middleware/       X-User-Id → req.userId
-│   │   ├── routes/           thin: validate, call service, respond
-│   │   └── services/         booking and check-in rules
-│   └── tests/
-└── app/
-    └── src/
-        ├── app/              screens: events (index), tickets, scan + tab layout
-        ├── components/       cards, header, scanner result, etc.
-        ├── locales/          en.json, ja.json
-        ├── api.ts            typed API client
-        ├── theme.ts          colours, spacing, radii
-        └── i18n.ts, format.ts, use-request.ts, user-context.tsx
-```
-
-## Decisions and trade-offs
-
-- **No real auth, on purpose.** The `X-User-Id` header stands in for a session, and the API only checks that the user exists. Check-in is a staff action, so any valid user can check in any ticket. In production these would be real sessions and a staff role.
-- **Integer money.** `price` is stored in the smallest currency unit (yen have no minor unit) with a `currency` column, never as a float. The app formats it with `Intl.NumberFormat`.
-- **Random ticket codes.** 10 characters from Crockford base32 (no I/L/O/U), generated with `crypto.randomInt`, so codes can't be guessed. A unique index guarantees there are no duplicates.
-- **Started events can't be booked.** Booking one returns 409 `EVENT_STARTED`. The request was valid, but the event's state no longer allows booking.
-- **CommonJS API.** The Prisma client is generated as CommonJS so Jest (ts-jest) runs without ESM setup.
-- **App error messages.** Known API error codes are translated (EN/JA). Any other error shows the server's message.
-- **Seeded users are hard-coded in the app** ([`app/src/users.ts`](app/src/users.ts)) for the user switcher, since there is no users endpoint.
+- `X-User-Id` instead of real auth, on purpose. Any user can check a ticket in, standing in for gate staff.
+- Prices are stored as integers in the smallest currency unit (yen), never as floats.
+- Ticket codes are 10 random characters from `crypto`, kept unique by a database index.
+- If the app can't reach the API: check that the phone and computer are on the same Wi-Fi, re-run the `echo ... > .env` line, and restart with `npx expo start -c`.
