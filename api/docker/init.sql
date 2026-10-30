@@ -1,0 +1,2 @@
+CREATE DATABASE IF NOT EXISTS ota_test;
+GRANT ALL PRIVILEGES ON ota_test.* TO 'ota'@'%';
