@@ -1,0 +1,72 @@
+{
+  "tabs": {
+    "events": "イベント",
+    "tickets": "マイチケット",
+    "scan": "スキャン"
+  },
+  "common": {
+    "retry": "再読み込み",
+    "ok": "OK",
+    "loading": "読み込み中…"
+  },
+  "header": {
+    "scan": "チケットをスキャン",
+    "switchUser": "ユーザーを切り替え",
+    "language": "言語"
+  },
+  "users": {
+    "title": "ユーザーを切り替え",
+    "id": "ユーザー #{{id}}"
+  },
+  "banner": {
+    "title": "Ōta TOKYO イベント",
+    "subtitle": "売り切れる前に、お早めにご予約ください"
+  },
+  "events": {
+    "title": "開催予定のイベント",
+    "empty": "開催予定のイベントはありません",
+    "ticketsLeft": "残り{{count}}枚",
+    "soldOut": "売り切れ",
+    "book": "予約する",
+    "increase": "枚数を増やす",
+    "decrease": "枚数を減らす"
+  },
+  "booking": {
+    "successTitle": "予約が完了しました",
+    "successMessage_other": "{{event}}のチケットを{{count}}枚予約しました。",
+    "viewTickets": "チケットを見る",
+    "failedTitle": "予約できませんでした"
+  },
+  "tickets": {
+    "title": "マイチケット",
+    "empty": "チケットはありません",
+    "emptyHint": "イベントを予約すると、ここにチケットが表示されます。",
+    "checkedIn": "入場済み"
+  },
+  "scan": {
+    "title": "QRスキャナー",
+    "hint": "QRコードを枠内に合わせてください",
+    "close": "閉じる",
+    "torch": "ライト",
+    "permissionTitle": "カメラへのアクセスが必要です",
+    "permissionMessage": "チケットを読み取るには、カメラへのアクセスを許可してください。",
+    "allowCamera": "カメラを許可する",
+    "openSettings": "設定を開く",
+    "checking": "確認中…",
+    "successTitle": "入場を受け付けました",
+    "alreadyTitle": "入場済みのチケットです",
+    "alreadyMessage": "{{time}}に入場済みです。",
+    "notFoundTitle": "チケットが見つかりません",
+    "notFoundMessage": "有効なチケットのQRコードではありません。",
+    "errorTitle": "エラーが発生しました",
+    "scanNext": "次をスキャン"
+  },
+  "errors": {
+    "NETWORK_ERROR": "サーバーに接続できません。通信環境をご確認のうえ、もう一度お試しください。",
+    "SOLD_OUT": "ご希望の枚数をご用意できません（残り{{ticketsLeft}}枚）。",
+    "EVENT_STARTED": "このイベントはすでに開始しています。",
+    "EVENT_NOT_FOUND": "このイベントは見つかりません。",
+    "UNAUTHORIZED": "ユーザーが見つかりません。ユーザーを切り替えてお試しください。",
+    "UNKNOWN_ERROR": "エラーが発生しました。もう一度お試しください。"
+  }
+}

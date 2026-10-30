@@ -1,0 +1,73 @@
+{
+  "tabs": {
+    "events": "Events",
+    "tickets": "My Tickets",
+    "scan": "Scan"
+  },
+  "common": {
+    "retry": "Retry",
+    "ok": "OK",
+    "loading": "Loading…"
+  },
+  "header": {
+    "scan": "Scan tickets",
+    "switchUser": "Switch user",
+    "language": "Language"
+  },
+  "users": {
+    "title": "Switch user",
+    "id": "User #{{id}}"
+  },
+  "banner": {
+    "title": "Ōta TOKYO events",
+    "subtitle": "Book your spot before it sells out"
+  },
+  "events": {
+    "title": "Upcoming events",
+    "empty": "No upcoming events",
+    "ticketsLeft": "{{count}} left",
+    "soldOut": "Sold out",
+    "book": "Book",
+    "increase": "Increase quantity",
+    "decrease": "Decrease quantity"
+  },
+  "booking": {
+    "successTitle": "You're in!",
+    "successMessage_one": "1 ticket booked for {{event}}.",
+    "successMessage_other": "{{count}} tickets booked for {{event}}.",
+    "viewTickets": "View tickets",
+    "failedTitle": "Booking failed"
+  },
+  "tickets": {
+    "title": "My Tickets",
+    "empty": "No tickets available",
+    "emptyHint": "Book an event and your tickets will show up here.",
+    "checkedIn": "Checked in"
+  },
+  "scan": {
+    "title": "QR Scanner",
+    "hint": "Align QR code within the frame",
+    "close": "Close",
+    "torch": "Flashlight",
+    "permissionTitle": "Camera access needed",
+    "permissionMessage": "Allow camera access to scan tickets.",
+    "allowCamera": "Allow camera",
+    "openSettings": "Open Settings",
+    "checking": "Checking ticket…",
+    "successTitle": "Checked in",
+    "alreadyTitle": "Already checked in",
+    "alreadyMessage": "This ticket was used on {{time}}.",
+    "notFoundTitle": "Ticket not found",
+    "notFoundMessage": "This QR code is not a valid ticket.",
+    "errorTitle": "Something went wrong",
+    "scanNext": "Scan next"
+  },
+  "errors": {
+    "NETWORK_ERROR": "Can't reach the server. Check your connection and try again.",
+    "SOLD_OUT": "Not enough tickets left (remaining: {{ticketsLeft}}).",
+    "EVENT_STARTED": "This event has already started.",
+    "EVENT_NOT_FOUND": "This event no longer exists.",
+    "UNAUTHORIZED": "Unknown user. Please switch user and try again.",
+    "UNKNOWN_ERROR": "Something went wrong. Please try again."
+  }
+}
