@@ -21,6 +21,8 @@ type ErrorBody = {
 };
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
+// Without a timeout, a wrong IP or a blocked Local Network permission leaves iOS waiting about a minute.
+const REQUEST_TIMEOUT_MS = 10_000;
 
 export class ApiError extends Error {
   constructor(
@@ -38,15 +40,20 @@ async function request<T>(userId: number, path: string, body?: object): Promise<
     throw new ApiError(0, "CONFIG_ERROR", "EXPO_PUBLIC_API_URL is not set in app/.env");
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let response: Response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       method: body ? "POST" : "GET",
       headers: { "Content-Type": "application/json", "X-User-Id": String(userId) },
       body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
     });
   } catch {
     throw new ApiError(0, "NETWORK_ERROR", `Could not reach the API at ${API_URL}`);
+  } finally {
+    clearTimeout(timeout);
   }
 
   const json: unknown = await response.json().catch(() => null);
